@@ -1,0 +1,81 @@
+
+> leet-repeat-app@1.0.0 dev
+> concurrently "npm run dev:server" "npm run dev:web"
+
+[0] 
+[0] > leet-repeat-app@1.0.0 dev:server
+[0] > tsx watch src/controller.ts
+[0] 
+[1] 
+[1] > leet-repeat-app@1.0.0 dev:web
+[1] > npm --prefix web run dev
+[1] 
+[1] 
+[1] > leet-repeat-web@1.0.0 dev
+[1] > vite
+[1] 
+[0] Server running at http://localhost:3000
+[1] 
+[1]   [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m473[22m[2m[0m ms[22m
+[1] 
+[1]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[1] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[0] 1:53:28 PM [tsx] change in ./src\controller.ts Restarting...
+[0] c1:58:29 PM [tsx] change in ./src\controller.ts Rerunning...
+c(node:9968) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+[0] In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+[0] 
+[0] To prepare for this change:
+[0] - If you want the current behavior, explicitly use 'sslmode=verify-full'
+[0] - If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+[0] 
+[0] See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+[0] (Use `node --trace-warnings ...` to show where the warning was created)
+[0] Failed to start server. Run `npm run db:push` and verify DATABASE_URL. PrismaClientKnownRequestError: 
+[0] Invalid `prisma.appConfig.upsert()` invocation in
+[0] C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\src\db.ts:45:41
+[0] 
+[0]   42 }
+[0]   43 
+[0]   44 export async function getConfig(): Promise<Config> {
+[0] → 45   const config = await prisma.appConfig.upsert(
+[0] The table `public.AppConfig` does not exist in the current database.
+[0]     at zr.handleRequestError (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:237:13)
+[0]     at zr.handleAndLogRequestError (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:183:12)
+[0]     at zr.request (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:152:12)
+[0]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[0]     at async a (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisFailed to start server. Run `npm run db:push` and verify DATABASE_URL. PrismaClientKnownRequestError: 
+[0] Invalid `prisma.appConfig.upsert()` invocation in
+[0] C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\src\db.ts:45:41
+[0] 
+[0]   42 }
+[0]   43 
+[0]   44 export async function getConfig(): Promise<Config> {
+[0] → 45   const config = await prisma.appConfig.upsert(
+[0] The table `public.AppConfig` does not exist in the current database.
+[0]     at zr.handleRequestError (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:237:13)
+[0]     at zr.handleAndLogRequestError (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:183:12)
+[0]     at zr.request (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:152:12)
+[0]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[0]     at async a (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:963:24)
+[0]     at async getConfig (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\src\db.ts:45:18)
+[0]     at async bootstrap (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\src\controller.ts:98:5) {
+[0]   code: 'P2021',
+[0]   meta: {
+[0]     modelName: 'AppConfig',
+[0]     driverAdapterError: DriverAdapterError: TableDoesNotExist
+[0]         at PgTransaction.onError (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\adapter-pg\dist\index.js:678:11)
+[0]         at PgTransaction.performIO (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\adapter-pg\dist\index.js:673:12)
+[0]         at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[0]         at async PgTransaction.queryRaw (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\adapter-pg\dist\index.js:604:30)
+[0]         at async e.interpretNode (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:186:26)
+[0]         at async e.interpretNode (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:128:29)
+[0]         at async e.interpretNode (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:272:41)
+[0]         at async e.interpretNode (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:262:25)
+[0]         at async e.run (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:94:23)
+[0]         at async e.execute (C:\Users\ngoca\OneDrive\Máy tính\work\leet repeat\app\node_modules\@prisma\client\src\runtime\core\engines\client\LocalExecutor.ts:81:12) {
+[0]       cause: [Object]
+[0]     }
+[0]   },
+[0]   clientVersion: '7.8.0'
+[0] }

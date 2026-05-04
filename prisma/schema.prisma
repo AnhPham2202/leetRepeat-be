@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String       @id @default(cuid())
+  username    String       @unique
+  repetitions Repetition[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Problem {
+  id          String       @id
+  title       String
+  difficulty  String
+  url         String
+  repetitions Repetition[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Repetition {
+  id         String   @id @default(cuid())
+  userId     String
+  problemId  String
+  repetition Int
+  interval   Int
+  nextReview DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+  @@index([userId, nextReview])
+}
+
+model AppConfig {
+  id                Int      @id @default(1)
+  firstIntervalDays Int
+  repFactor         Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
