@@ -1,5 +1,5 @@
-import {prisma} from "./prisma";
-import {applyReview, buildNewRepetition, type Config, isDue, type Repetition} from "./spaced-repetition";
+import { prisma } from "./prisma";
+import { applyReview, buildNewRepetition, type Config, isDue, type Repetition } from "./spaced-repetition";
 
 export type Problem = {
   id: string;
@@ -10,41 +10,28 @@ export type Problem = {
 
 export type DueItem = Repetition & { problem: Problem };
 
-type LegacyConfig = {
-  firstIntervalDays?: number;
-  repFactor?: number;
-  intervals?: number[];
-  easeFactor?: number;
-};
-
-type LegacyDatabase = {
-  problems?: Problem[];
-  repetitions?: Repetition[];
-  config?: LegacyConfig;
-};
-
-const DEFAULT_USER_USERNAME = "local";
 const DEFAULT_CONFIG: Config = {
   firstIntervalDays: 1,
   repFactor: 2
 };
 
-async function ensureDefaultUserId(): Promise<string> {
+async function ensureUserInternalId(userId: string): Promise<string> {
   const user = await prisma.user.upsert({
-    where: { username: DEFAULT_USER_USERNAME },
+    where: { username: userId },
     update: {},
-    create: { username: DEFAULT_USER_USERNAME }
+    create: { username: userId }
   });
 
   return user.id;
 }
 
-export async function getConfig(): Promise<Config> {
+export async function getConfig(userId: string): Promise<Config> {
+  const internalUserId = await ensureUserInternalId(userId);
   const config = await prisma.appConfig.upsert({
-    where: { id: 1 },
+    where: { userId: internalUserId },
     update: {},
     create: {
-      id: 1,
+      userId: internalUserId,
       firstIntervalDays: DEFAULT_CONFIG.firstIntervalDays,
       repFactor: DEFAULT_CONFIG.repFactor
     }
@@ -56,15 +43,16 @@ export async function getConfig(): Promise<Config> {
   };
 }
 
-export async function updateConfig(config: Config): Promise<Config> {
+export async function updateConfig(userId: string, config: Config): Promise<Config> {
+  const internalUserId = await ensureUserInternalId(userId);
   const updated = await prisma.appConfig.upsert({
-    where: { id: 1 },
+    where: { userId: internalUserId },
     update: {
       firstIntervalDays: Math.round(config.firstIntervalDays),
       repFactor: config.repFactor
     },
     create: {
-      id: 1,
+      userId: internalUserId,
       firstIntervalDays: Math.round(config.firstIntervalDays),
       repFactor: config.repFactor
     }
@@ -76,12 +64,12 @@ export async function updateConfig(config: Config): Promise<Config> {
   };
 }
 
-export async function addProblem(problem: Problem): Promise<{ created: boolean }> {
-  const userId = await ensureDefaultUserId();
+export async function addProblem(userId: string, problem: Problem): Promise<{ created: boolean }> {
+  const internalUserId = await ensureUserInternalId(userId);
   const existing = await prisma.repetition.findUnique({
     where: {
       userId_problemId: {
-        userId,
+        userId: internalUserId,
         problemId: problem.id
       }
     }
@@ -106,12 +94,12 @@ export async function addProblem(problem: Problem): Promise<{ created: boolean }
     }
   });
 
-  const config = await getConfig();
+  const config = await getConfig(userId);
   const repetition = buildNewRepetition(problem.id, config);
 
   await prisma.repetition.create({
     data: {
-      userId,
+      userId: internalUserId,
       problemId: repetition.problemId,
       repetition: repetition.repetition,
       interval: repetition.interval,
@@ -122,10 +110,10 @@ export async function addProblem(problem: Problem): Promise<{ created: boolean }
   return { created: true };
 }
 
-export async function getDueItems(): Promise<DueItem[]> {
-  const userId = await ensureDefaultUserId();
+export async function getDueItems(userId: string): Promise<DueItem[]> {
+  const internalUserId = await ensureUserInternalId(userId);
   const items = await prisma.repetition.findMany({
-    where: { userId },
+    where: { userId: internalUserId },
     include: { problem: true },
     orderBy: { nextReview: "asc" }
   });
@@ -146,12 +134,12 @@ export async function getDueItems(): Promise<DueItem[]> {
     }));
 }
 
-export async function updateReview(problemId: string, quality: number): Promise<Repetition | null> {
-  const userId = await ensureDefaultUserId();
+export async function updateReview(userId: string, problemId: string, quality: number): Promise<Repetition | null> {
+  const internalUserId = await ensureUserInternalId(userId);
   const current = await prisma.repetition.findUnique({
     where: {
       userId_problemId: {
-        userId,
+        userId: internalUserId,
         problemId
       }
     }
@@ -161,7 +149,7 @@ export async function updateReview(problemId: string, quality: number): Promise<
     return null;
   }
 
-  const config = await getConfig();
+  const config = await getConfig(userId);
   const next = applyReview(
     {
       problemId: current.problemId,
@@ -176,7 +164,7 @@ export async function updateReview(problemId: string, quality: number): Promise<
   const updated = await prisma.repetition.update({
     where: {
       userId_problemId: {
-        userId,
+        userId: internalUserId,
         problemId
       }
     },

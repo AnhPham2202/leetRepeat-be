@@ -1,26 +1,47 @@
-import express, {Request, Response as ExpressResponse} from "express";
-import {addProblem, getConfig, getDueItems, Problem, updateConfig, updateReview} from "./db";
-import {validateLeetCodeProblemUrl} from "./service";
+import express, { Request, Response as ExpressResponse } from "express";
+import { addProblem, getConfig, getDueItems, Problem, updateConfig, updateReview } from "./db";
+import { validateLeetCodeProblemUrl } from "./service";
 
 const app = express();
 const port = 3000;
+const USER_ID_MAX_LENGTH = 100;
+const STARTUP_USER_ID = "bootstrap-user";
 
 app.use(express.json());
+
+function parseUserId(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const normalized = value.trim();
+  if (!normalized || normalized.length > USER_ID_MAX_LENGTH) {
+    return null;
+  }
+
+  return normalized;
+}
 
 app.get("/api/health", (_req: Request, res: ExpressResponse) => {
   res.json({ status: "ok" });
 });
 
-app.get("/api/config", async (_req: Request, res: ExpressResponse) => {
-  const config = await getConfig();
+app.get("/api/config", async (req: Request, res: ExpressResponse) => {
+  const userId = parseUserId(req.query.userId);
+  if (!userId) {
+    res.status(400).json({ error: "Missing or invalid userId query parameter" });
+    return;
+  }
+
+  const config = await getConfig(userId);
   res.json(config);
 });
 
 app.post("/api/problems", async (req: Request, res: ExpressResponse) => {
-  const { id, title, url } = req.body as Partial<Pick<Problem, "id" | "title" | "url">>;
+  const { id, title, url, userId: rawUserId } = req.body as Partial<Pick<Problem, "id" | "title" | "url">> & { userId?: string };
+  const userId = parseUserId(rawUserId);
 
-  if (!id || !title || !url) {
-    res.status(400).json({ error: "Missing required fields: id, title, url" });
+  if (!userId || !id || !title || !url) {
+    res.status(400).json({ error: "Missing required fields: userId, id, title, url" });
     return;
   }
   const validation = await validateLeetCodeProblemUrl(url);
@@ -35,7 +56,7 @@ app.post("/api/problems", async (req: Request, res: ExpressResponse) => {
     return;
   }
 
-  const result = await addProblem({ id, title, difficulty: validation.difficulty, url: validation.url });
+  const result = await addProblem(userId, { id, title, difficulty: validation.difficulty, url: validation.url });
   if (!result.created) {
     res.status(200).json({ message: "Problem already exists" });
     return;
@@ -44,16 +65,23 @@ app.post("/api/problems", async (req: Request, res: ExpressResponse) => {
   res.status(201).json({ message: "Problem added" });
 });
 
-app.get("/api/due", async (_req: Request, res: ExpressResponse) => {
-  const due = await getDueItems();
+app.get("/api/due", async (req: Request, res: ExpressResponse) => {
+  const userId = parseUserId(req.query.userId);
+  if (!userId) {
+    res.status(400).json({ error: "Missing or invalid userId query parameter" });
+    return;
+  }
+
+  const due = await getDueItems(userId);
   res.json(due);
 });
 
 app.post("/api/review", async (req: Request, res: ExpressResponse) => {
-  const { problemId, quality } = req.body as { problemId?: string; quality?: number };
+  const { userId: rawUserId, problemId, quality } = req.body as { userId?: string; problemId?: string; quality?: number };
+  const userId = parseUserId(rawUserId);
 
-  if (!problemId || typeof quality !== "number") {
-    res.status(400).json({ error: "Missing required fields: problemId, quality" });
+  if (!userId || !problemId || typeof quality !== "number") {
+    res.status(400).json({ error: "Missing required fields: userId, problemId, quality" });
     return;
   }
 
@@ -62,7 +90,7 @@ app.post("/api/review", async (req: Request, res: ExpressResponse) => {
     return;
   }
 
-  const repetition = await updateReview(problemId, quality);
+  const repetition = await updateReview(userId, problemId, quality);
   if (!repetition) {
     res.status(404).json({ error: "Problem repetition not found" });
     return;
@@ -72,7 +100,13 @@ app.post("/api/review", async (req: Request, res: ExpressResponse) => {
 });
 
 app.post("/api/config", async (req: Request, res: ExpressResponse) => {
-  const { firstIntervalDays, repFactor } = req.body as { firstIntervalDays?: number; repFactor?: number };
+  const { userId: rawUserId, firstIntervalDays, repFactor } = req.body as { userId?: string; firstIntervalDays?: number; repFactor?: number };
+  const userId = parseUserId(rawUserId);
+
+  if (!userId) {
+    res.status(400).json({ error: "Missing required field: userId" });
+    return;
+  }
 
   if (typeof firstIntervalDays !== "number" || firstIntervalDays <= 0) {
     res.status(400).json({ error: "firstIntervalDays must be a positive number" });
@@ -84,7 +118,7 @@ app.post("/api/config", async (req: Request, res: ExpressResponse) => {
     return;
   }
 
-  const config = await updateConfig({
+  const config = await updateConfig(userId, {
     firstIntervalDays: Math.round(firstIntervalDays),
     repFactor
   });
@@ -95,7 +129,7 @@ app.post("/api/config", async (req: Request, res: ExpressResponse) => {
 async function bootstrap(): Promise<void> {
   try {
     // Force a DB read at startup so Prisma/table issues fail fast with a clear log.
-    await getConfig();
+    await getConfig(STARTUP_USER_ID);
     app.listen(port, () => {
       console.log(`Server running at http://localhost:${port}`);
     });
