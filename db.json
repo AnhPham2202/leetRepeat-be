@@ -1,0 +1,49 @@
+{
+  "problems": [
+    {
+      "id": "valid-parentheses",
+      "title": "valid-parentheses",
+      "difficulty": "unknown",
+      "url": "https://leetcode.com/problems/valid-parentheses/description/"
+    },
+    {
+      "id": "merge-two-sorted-lists",
+      "title": "merge-two-sorted-lists",
+      "difficulty": "unknown",
+      "url": "https://leetcode.com/problems/merge-two-sorted-lists/"
+    },
+    {
+      "id": "generate-parentheses",
+      "title": "generate-parentheses",
+      "difficulty": "medium",
+      "url": "https://leetcode.com/problems/generate-parentheses/"
+    }
+  ],
+  "repetitions": [
+    {
+      "problemId": "valid-parentheses",
+      "repetition": 1,
+      "interval": 1,
+      "nextReview": "2026-05-02T17:00:00.000Z"
+    },
+    {
+      "problemId": "merge-two-sorted-lists",
+      "repetition": 1,
+      "interval": 1,
+      "nextReview": "2026-05-02T17:00:00.000Z"
+    },
+    {
+      "problemId": "generate-parentheses",
+      "repetition": 1,
+      "interval": 1,
+      "nextReview": "2026-05-02T17:00:00.000Z"
+    }
+  ],
+  "config": {
+    "intervals": [
+      1,
+      2
+    ],
+    "easeFactor": 2.1
+  }
+}
