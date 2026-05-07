@@ -1,12 +1,37 @@
-import express, { Request, Response as ExpressResponse } from "express";
+import express, { NextFunction, Request, Response as ExpressResponse } from "express";
 import { addProblem, getConfig, getDueItems, Problem, updateConfig, updateReview } from "./db";
 import { validateLeetCodeProblemUrl } from "./service";
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT ?? 3000);
 const USER_ID_MAX_LENGTH = 100;
 const STARTUP_USER_ID = "bootstrap-user";
+const allowedOrigins = (process.env.CORS_ORIGIN ?? "*")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
+app.use((req: Request, res: ExpressResponse, next: NextFunction) => {
+  const origin = req.headers.origin;
+  const allowAnyOrigin = allowedOrigins.includes("*");
+
+  if (allowAnyOrigin) {
+    res.header("Access-Control-Allow-Origin", "*");
+  } else if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+  }
+
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
 app.use(express.json());
 
 function parseUserId(value: unknown): string | null {
