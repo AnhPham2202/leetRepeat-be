@@ -25,6 +25,15 @@ async function ensureUserInternalId(userId: string): Promise<string> {
   return user.id;
 }
 
+export async function userExists(userId: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { username: userId },
+    select: { id: true }
+  });
+
+  return user !== null;
+}
+
 export async function getConfig(userId: string): Promise<Config> {
   const internalUserId = await ensureUserInternalId(userId);
   const config = await prisma.appConfig.upsert({

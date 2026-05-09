@@ -1,60 +1,90 @@
-# Leet Repeat (MVP)
+# 🔁🔁🔁 Leet's Repeat 🔁🔁🔁
 
-## Structure
+A tiny website made to stop myself from forgetting every LeetCode problem I've ever solved 😭
 
-- `app/`: Backend Express JSON API only
-- `app/web/`: React + Tailwind frontend (Vite)
-- `extension/`: Chrome extension (content script)
+## Why does this exist?
 
-## Run in development
+While grinding interview prep, I realized something kinda funny:
 
-```bash
-cd app
-npm install
-npm run dev
-```
+The fastest way to get good at live coding is basically... learning like we used to learn math back in school.
 
-- Backend API: `http://localhost:3000`
-- Frontend dev: `http://localhost:5173` (proxy `/api` to backend)
+You read a problem and the solution path just pops into your head automatically.
 
-## Build
+At some point, you stop asking:
+> “Wait... why does this even work again?”
 
-```bash
-cd app
-npm run build
-```
+because you've seen the pattern so many times over months or even years that it becomes instinct.
 
-This builds:
-- backend (`app/dist`)
-- frontend static files (`app/web/dist`)
+First you memorize the approach.  
+Then after repeating it enough:
+- you actually understand why it works
+- you recognize patterns instantly
+- you start finding cleaner or smarter solutions on your own
+- and problem solving becomes way less scary
 
-Run backend only:
+That's basically spaced repetition.
 
-```bash
-cd app
-npm start
-```
+So yeah... I built this 😎
 
-## Load extension
+---
 
-1. Open Chrome `chrome://extensions`
-2. Enable Developer mode
-3. Click **Load unpacked** and select `extension/`
-4. Open a LeetCode problem page, solve to Accepted, click **Add to Repetition**
+# How to use it
 
-## API
+Very simple.
 
-- `GET /api/health`
-- `POST /api/problems`
-- `GET /api/due`
-- `POST /api/review`
-- `GET /api/config`
-- `POST /api/config`
+## Add problems
 
-## Database
+Paste a LeetCode link.
 
-Data is in `app/db.json` with:
+Examples:
+- https://leetcode.com/problems/two-sum
+- https://leetcode.com/problems/lru-cache
 
-- `problems`
-- `repetitions`
-- `config`
+Done 👍
+
+---
+
+## Daily review
+
+Every day, the app shows problems that are scheduled for review.
+
+Just:
+- open the problem
+- solve it again
+- rate how painful it was 💀
+
+Something like:
+- Easy
+- Medium
+- Hard af
+
+Based on your rating, the system calculates when you should see the problem again.
+
+---
+
+## Settings
+
+You can tweak:
+- start date
+- repetition intervals
+
+Or just leave everything on default and trust the process 😌
+
+---
+
+# The goal
+
+Not memorizing solutions.
+
+The real goal is reaching the point where:
+- you instantly recognize patterns
+- ideas come naturally during live coding
+- you stop panicking in interviews
+- and you actually understand problems instead of memorizing tricks
+
+If you've ever:
+- solved a problem and completely forgot it 2 weeks later
+- looked at an old problem like it was brand new
+- said “bro I swear I've done this before”
+
+then this thing is probably for you 🚀

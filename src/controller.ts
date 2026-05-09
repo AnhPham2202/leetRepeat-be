@@ -1,5 +1,5 @@
 import express, { Request, Response as ExpressResponse } from "express";
-import { addProblem, getConfig, getDueItems, Problem, updateConfig, updateReview } from "./db";
+import { addProblem, getConfig, getDueItems, Problem, updateConfig, updateReview, userExists } from "./db";
 import { validateLeetCodeProblemUrl } from "./service";
 
 const app = express();
@@ -23,6 +23,16 @@ function parseUserId(value: unknown): string | null {
 
 app.get("/api/health", (_req: Request, res: ExpressResponse) => {
   res.json({ status: "ok" });
+});
+
+app.get("/api/users/exists", async (req: Request, res: ExpressResponse) => {
+  const userId = parseUserId(req.query.userId);
+  if (!userId) {
+    res.status(400).json({ error: "Missing or invalid userId query parameter" });
+    return;
+  }
+
+  res.json({ exists: await userExists(userId) });
 });
 
 app.get("/api/config", async (req: Request, res: ExpressResponse) => {
