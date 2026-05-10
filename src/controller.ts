@@ -144,7 +144,7 @@ async function bootstrap(): Promise<void> {
       console.log(`Server running at http://localhost:${port}`);
     });
   } catch (error) {
-    console.error("Failed to start server. Run `npm run db:push` and verify DATABASE_URL.", error);
+    console.error("Failed to start server", error);
     process.exit(1);
   }
 }
